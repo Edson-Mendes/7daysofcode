@@ -12,18 +12,17 @@ import java.util.Scanner;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.emendes.model.Movie;
+
 public class App {
   public static void main(String[] args) {
     String apiKey = enterApiKey();
     String json = sendRequest(apiKey);
 
-    List<String> movies = parseJsonMovies(json);
+    List<String> moviesList = parseJsonMovies(json);
 
-    List<String> titles = parseField(movies, "title");
-    titles.forEach(System.out::println);
-
-    List<String> images = parseField(movies, "image");
-    images.forEach(System.out::println);
+    List<Movie> movies = parseMovies(moviesList);
+    movies.forEach(System.out::println);
 
   }
 
@@ -87,6 +86,29 @@ public class App {
     });
 
     return fieldList;
+  }
+
+  private static List<Movie> parseMovies(List<String> moviesList) {
+    List<Movie> movies = new ArrayList<Movie>();
+
+    moviesList.forEach(m -> {
+      try {
+        JsonNode json = new ObjectMapper().readTree(m);
+        
+        String title = json.get("title").asText();
+        String urlImage = json.get("image").asText();
+        String rating = json.get("imDbRating").asText();
+        String year = json.get("year").asText();
+
+        Movie movie = new Movie(title, urlImage, rating, year);
+
+        movies.add(movie);
+      } catch (Exception e) {
+        throw new RuntimeException(e.getMessage());
+      }
+    });
+
+    return movies;
   }
 
 }
