@@ -5,7 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,43 +17,14 @@ public class App {
     String apiKey = enterApiKey();
     String json = sendRequest(apiKey);
 
-    parseJsonTitles(json).forEach(System.out::println);
-    parseJsonImages(json).forEach(System.out::println);
+    List<String> movies = parseJsonMovies(json);
 
-  }
+    List<String> titles = parseField(movies, "title");
+    titles.forEach(System.out::println);
 
-  private static List<String> parseJsonTitles(String source) {
-    try {
-      JsonNode content = new ObjectMapper().readTree(source);
-      Iterator<JsonNode> iterator = content.get("items").iterator();
+    List<String> images = parseField(movies, "image");
+    images.forEach(System.out::println);
 
-      List<String> titles = new ArrayList<>();
-
-      iterator.forEachRemaining(jsonNode -> {
-        titles.add(jsonNode.get("title").asText().replaceAll("\"", ""));
-      });
-
-      return titles;
-    } catch (Exception e) {
-      throw new RuntimeException(e.getMessage());
-    }
-  }
-
-  private static List<String> parseJsonImages(String source) {
-    try {
-      JsonNode content = new ObjectMapper().readTree(source);
-      Iterator<JsonNode> iterator = content.get("items").iterator();
-
-      List<String> images = new ArrayList<>();
-
-      iterator.forEachRemaining(jsonNode -> {
-        images.add(jsonNode.get("image").asText().replaceAll("\"", ""));
-      });
-
-      return images;
-    } catch (Exception e) {
-      throw new RuntimeException(e.getMessage());
-    }
   }
 
   private static String enterApiKey() {
@@ -61,7 +32,7 @@ public class App {
 
     System.out.println("Digite sua api key:");
     String apiKey = input.nextLine();
-    
+
     input.close();
     return apiKey;
   }
@@ -90,6 +61,32 @@ public class App {
       return;
     }
     throw new RuntimeException(errorMessage);
+  }
+
+  private static List<String> parseJsonMovies(String source) {
+    String[] movies = source
+        .replaceAll("],\"errorMessage\":\"\"}", "")
+        .replace("{\"items\":[", "")
+        .replaceAll("},", "}__")
+        .split("__");
+
+    return Arrays.asList(movies);
+  }
+
+  private static List<String> parseField(List<String> movies, String field) {
+    List<String> fieldList = new ArrayList<>();
+
+    movies.forEach(movie -> {
+      try {
+        JsonNode json = new ObjectMapper().readTree(movie);
+        String title = json.get(field).asText();
+        fieldList.add(title);
+      } catch (Exception e) {
+        throw new RuntimeException(e.getMessage());
+      }
+    });
+
+    return fieldList;
   }
 
 }
