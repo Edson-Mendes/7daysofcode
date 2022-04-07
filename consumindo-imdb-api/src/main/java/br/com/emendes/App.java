@@ -1,5 +1,8 @@
 package br.com.emendes;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -13,17 +16,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.emendes.model.Movie;
+import br.com.emendes.view.HtmlGenerator;
 
 public class App {
-  public static void main(String[] args) {
+
+  public static void main(String[] args) throws Exception {
     String apiKey = enterApiKey();
     String json = sendRequest(apiKey);
 
     List<String> moviesList = parseJsonMovies(json);
 
     List<Movie> movies = parseMovies(moviesList);
-    movies.forEach(System.out::println);
 
+    Writer printWriter = new PrintWriter("src/main/java/br/com/emendes/view/index.html");
+
+    
+    HtmlGenerator html = new HtmlGenerator(printWriter);
+    html.generate(movies);
+    
+    printWriter.close();
   }
 
   private static String enterApiKey() {
