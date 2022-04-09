@@ -52,8 +52,10 @@ public class HtmlGenerator {
     String body = """
 
         <body>
-          <div class=\".container\">
+          <div class=\".container p-6\">
+            <div class=\"row align-items-center\">
           %s
+            </div>
           </div>
         </body>""";
     return String.format(body, cards);
@@ -77,16 +79,26 @@ public class HtmlGenerator {
     String year = movie.getYear();
 
     String card = """
-      <div class=\"card text-white bg-dark mb-3\" style=\"max-width: 18rem;\">
-        <h4 class=\"card-header\">%s</h4>
-        <div class=\"card-body\">
-          <img class=\"card-img\" src=\"%s\" alt=\"%s\">
-          <p class=\"card-text mt-2\">Nota: %s - Ano: %s</p>
+        <div class=\"card text-white bg-dark mb-3 col-3\" style=\"max-width: 18rem;\">
+          <h4 class=\"card-header\">%s</h4>
+          <div class=\"card-body\">
+            <img class=\"card-img\" src=\"%s\" alt=\"%s\">
+            <p class=\"card-text mt-2\">Nota: %s - Ano: %s</p>
+          </div>
         </div>
-      </div>
-      """;
+        """;
 
-    return String.format(card, title ,urlImage, title, rating, year);
+    return String.format(card, title, urlImage, title, rating, year);
+  }
+
+  private String header() {
+    // TODO: Em desenvolvimento
+    return "";
+  }
+
+  private String footer() {
+    // TODO: Em desenvolvimento
+    return "";
   }
 
 }
